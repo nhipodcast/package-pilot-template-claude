@@ -1,0 +1,11 @@
+out
+dist
+node_modules
+.vscode
+.vscode-test
+*.vsix
+bun.lockb
+.git
+git
+ppnpm-lock.yaml
+.DS
