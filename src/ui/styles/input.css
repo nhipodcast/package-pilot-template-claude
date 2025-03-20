@@ -9,7 +9,8 @@
     font-size: var(--vscode-font-size);
   }
 
-  code, pre {
+  code,
+  pre {
     font-family: var(--vscode-editor-font-family);
     font-size: var(--vscode-editor-font-size);
   }
@@ -30,5 +31,21 @@
 
   .vscode-card {
     @apply bg-vscode-dropdown-bg border border-vscode-border rounded-md p-4 shadow-sm;
+  }
+
+  .score-badge {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold;
+  }
+
+  .score-badge-high {
+    @apply bg-green-600 text-white;
+  }
+
+  .score-badge-medium {
+    @apply bg-yellow-500 text-black;
+  }
+
+  .score-badge-low {
+    @apply bg-red-600 text-white;
   }
 }

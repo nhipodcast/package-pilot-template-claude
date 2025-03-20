@@ -1,11 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Package Pilot</title>
-</head>
-<body>
-  <div id="root"></div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Package Pilot</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; img-src ${webview.cspSource} https:; script-src ${webview.cspSource}; style-src ${webview.cspSource}; font-src ${webview.cspSource};"
+    />
+    <style>
+      :root {
+        --vscode-editor-background: #1e1e1e;
+        --vscode-editor-foreground: #d4d4d4;
+        --vscode-button-background: #0e639c;
+        --vscode-button-foreground: #ffffff;
+        --vscode-button-hoverBackground: #1177bb;
+        --vscode-input-background: #3c3c3c;
+        --vscode-input-foreground: #cccccc;
+        --vscode-dropdown-background: #3c3c3c;
+        --vscode-dropdown-foreground: #f0f0f0;
+        --vscode-list-activeSelectionBackground: #04395e;
+        --vscode-list-activeSelectionForeground: #ffffff;
+        --vscode-list-hoverBackground: #2a2d2e;
+        --vscode-panel-border: #80808059;
+        --vscode-font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        --vscode-font-size: 13px;
+        --vscode-editor-font-family: "SF Mono", Monaco, Menlo, Courier,
+          monospace;
+        --vscode-editor-font-size: 12px;
+      }
+
+      body.vscode-light {
+        --vscode-editor-background: #ffffff;
+        --vscode-editor-foreground: #000000;
+        --vscode-button-background: #007acc;
+        --vscode-button-foreground: #ffffff;
+        --vscode-button-hoverBackground: #0062a3;
+        --vscode-input-background: #ffffff;
+        --vscode-input-foreground: #616161;
+        --vscode-dropdown-background: #ffffff;
+        --vscode-dropdown-foreground: #616161;
+        --vscode-list-activeSelectionBackground: #0074e8;
+        --vscode-list-activeSelectionForeground: #ffffff;
+        --vscode-list-hoverBackground: #e8e8e8;
+        --vscode-panel-border: #80808059;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        color: var(--vscode-editor-foreground);
+        background-color: var(--vscode-editor-background);
+        font-family: var(--vscode-font-family);
+        font-size: var(--vscode-font-size);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

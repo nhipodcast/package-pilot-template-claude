@@ -1,128 +1,16 @@
-import { errorString as errorHandler } from "../utils/errorHandler";
-import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
+import { errorString } from "../utils/errorHandling";
 
-export async function fetchNpmMetadata(
-  packageNames: string[]
-): Promise<Record<string, any>> {
-  const packageData: Record<string, any> = {};
-
-  await Promise.all(
-    packageNames.map(async (packageName) => {
-      try {
-        // Fetch basic package info from npm registry
-        const response = await axios.get(
-          `https://registry.npmjs.org/${packageName}`
-        );
-
-        if (response.status === 200) {
-          const data = response.data;
-          const latestVersion = data["dist-tags"]?.latest;
-
-          packageData[packageName] = {
-            name: packageName,
-            description: data.description || "",
-            version: latestVersion || "",
-            license: data.license || "Unknown",
-            homepage: data.homepage || "",
-            repository: data.repository?.url || "",
-            maintainers: data.maintainers?.length || 0,
-            lastPublished: data.time?.[latestVersion] || "",
-            dependencies: data.versions?.[latestVersion]?.dependencies || {},
-            weeklyDownloads: 0, // Will be populated with additional API call
-            alternatives: [], // Will be populated later with recommendations
-          };
-
-          // Additional API call to get download counts
-          try {
-            const downloadsResponse = await axios.get(
-              `https://api.npmjs.org/downloads/point/last-week/${packageName}`
-            );
-            if (downloadsResponse.status === 200) {
-              packageData[packageName].weeklyDownloads =
-                downloadsResponse.data.downloads || 0;
-            }
-          } catch (error) {
-            console.warn(`Could not fetch download stats for ${packageName}`);
-          }
-        }
-      } catch (error) {
-        console.warn(
-          `Error fetching metadata for ${packageName}: ${errorHandler(error)}`
-        );
-        // Store minimal info for packages that couldn't be fetched
-        packageData[packageName] = {
-          name: packageName,
-          description: "Could not fetch package data",
-          version: "",
-          error: errorHandler(error),
-        };
-      }
-    })
-  );
-
-  // Generate recommendations using a combination of predefined suggestions and AI analysis
-  await Promise.all(
-    Object.keys(packageData).map(async (packageName) => {
-      switch (packageName) {
-        case "moment":
-          packageData[packageName].alternatives = [
-            "date-fns",
-            "dayjs",
-            "luxon",
-          ];
-          packageData[packageName].aiReason =
-            "These modern alternatives offer better tree-shaking, smaller bundle sizes, and improved performance.";
-          break;
-        case "lodash":
-        case "underscore":
-          packageData[packageName].alternatives = ["lodash-es", "ramda"];
-          packageData[packageName].aiReason =
-            "ES module versions reduce bundle size, while native JS methods can replace many utility functions.";
-          break;
-        case "request":
-          packageData[packageName].alternatives = [
-            "axios",
-            "node-fetch",
-            "got",
-          ];
-          packageData[packageName].aiReason =
-            "Request is deprecated. These alternatives offer better Promise support and modern features.";
-          break;
-        case "jquery":
-          packageData[packageName].alternatives = ["cash-dom", "umbrella"];
-          packageData[packageName].aiReason =
-            "Modern browsers support most jQuery features natively. These lightweight alternatives offer similar APIs with much smaller footprints.";
-          break;
-        case "analyi_tool":
-          // analyis_tool
-          break;
-        case "analyis_strategy_dimension_weight":
-          // analyis_strategy_dimension_weight
-          break;
-        case "analyis_strategy_dimension_userbase":
-          // analyis_strategy_dimension_userbase
-          break;
-        case "analyis_strategy_hybrid_dimension_AB":
-          // analyis_strategy_hybrid_weight
-          break;
-        default:
-          // Use AI to generate recommendations
-          break;
-      }
-    })
-  );
-
-  return packageData;
-} // Recursive project scanning with optimizations
-
+/**
+ * Analyzes a file to find npm package imports
+ */
 export function analyzeFileImports(filePath: string): string[] {
   // Basic implementation - uses regex to extract imports
-  const content = fs.readFileSync(filePath, "utf8");
-  const imports = new Set<string>();
-
   try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const imports = new Set<string>();
+
     // Detect require statements
     const requireMatches = content.match(/require\(['"]([^'"]+)['"]\)/g);
     if (requireMatches) {
@@ -173,15 +61,19 @@ export function analyzeFileImports(filePath: string): string[] {
         }
       });
     }
+
+    return Array.from(imports);
   } catch (error) {
     console.error(
-      `Error parsing imports in ${filePath}: ${errorHandler(error)}`
+      `Error analyzing imports in ${filePath}: ${errorString(error)}`
     );
+    return [];
   }
-
-  return Array.from(imports);
 }
 
+/**
+ * Analyzes project structure and finds all package imports
+ */
 export function analyzeProjectStructure(targetPath: string, depth: number = 0) {
   interface ProjectAnalysis {
     structure: {
@@ -234,7 +126,7 @@ export function analyzeProjectStructure(targetPath: string, depth: number = 0) {
       }
     } catch (error) {
       // Skip files that can't be accessed
-      console.warn(`Unable to access ${fullPath}: ${errorHandler(error)}`);
+      console.warn(`Unable to access ${fullPath}: ${errorString(error)}`);
     }
   });
 
@@ -284,10 +176,23 @@ export function analyzeProjectStructure(targetPath: string, depth: number = 0) {
       }
     } catch (error) {
       console.warn(
-        `Error analyzing imports in ${fullPath}: ${errorHandler(error)}`
+        `Error analyzing imports in ${fullPath}: ${errorString(error)}`
       );
     }
   });
 
   return analysisResult;
+}
+
+/**
+ * Extracts unique packages from an import analysis
+ */
+export function extractUniquePackages(
+  packageImports: Record<string, string[]>
+): Set<string> {
+  const uniquePackages = new Set<string>();
+  Object.values(packageImports).forEach((imports) => {
+    imports.forEach((pkg) => uniquePackages.add(pkg));
+  });
+  return uniquePackages;
 }

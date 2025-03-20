@@ -1,1 +1,32 @@
-{"compilerOptions": {"module": "Node16", "target": "ES2022", "lib": ["ES2022"], "skipLibCheck": true, "sourceMap": true, "rootDir": "src", "strict": true}}
+{
+  "compilerOptions": {
+    "module": "Node16",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": "src",
+
+    "strict": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "Node16",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/ai/client.js",
+    "src/analysis/structure.js",
+    "src/analysis/scoring.js",
+    "src/analysis/rateLimitHandler.js",
+    "src/analysis/projectScanner.js",
+    "src/analysis/astParser.js"
+  ]
+}
