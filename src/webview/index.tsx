@@ -1,5 +1,6 @@
 import * as React from "react";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
+
 import { App } from "./App";
 
 declare const acquireVsCodeApi: <T = unknown>() => {
@@ -18,5 +19,5 @@ if (elm) {
 // @ts-expect-error
 if (import.meta.webpackHot) {
   // @ts-expect-error
-  import.meta.webpackHot.accept()
+  import.meta.webpackHot.accept();
 }
