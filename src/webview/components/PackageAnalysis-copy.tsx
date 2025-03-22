@@ -43,7 +43,7 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
   const fetchAnalysisData = async () => {
     try {
       setLoading(true);
-      messageHandler.send("ANALYZE_PROJECT");
+
       // Request analysis data from the extension
       const analysisData = await messageHandler.request<{
         packageData: Record<string, PackageData>;
