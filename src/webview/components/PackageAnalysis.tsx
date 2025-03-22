@@ -1,8 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import PackagePilotMessageHandler, {
-  CommandType,
-} from "./utils/messageHandler";
+import { messageHandler } from "@estruyf/vscode/dist/client";
 
 interface PackageData {
   name: string;
@@ -45,24 +43,36 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
   const fetchAnalysisData = async () => {
     try {
       setLoading(true);
-      // Trigger analysis using our custom message handler
-      PackagePilotMessageHandler.analyzeProject();
 
-      // Request analysis data using the custom message handler
-      const analysisData = await PackagePilotMessageHandler.getAnalysisData<{
-        packageData: Record<string, PackageData>;
-        packageUsage: Record<string, PackageUsage>;
-      }>();
+      // Request analysis data from the extension
+      const data: any = await messageHandler.request("GET_ANALYSIS_DATA");
 
-      if (analysisData) {
-        setPackages(analysisData.packageData || {});
-        setPackageUsage(analysisData.packageUsage || {});
+      if (data) {
+        const packageData = data.packageData || {};
+        setPackages(packageData);
+
+        // Transform packageImports to packageUsage format
+        const packageImports = data.analysis?.packageImports || {};
+        const packageUsage: Record<string, PackageUsage> = {};
+
+        // Iterate through file paths and their imports
+        Object.entries(packageImports).forEach(([filePath, imports]) => {
+          // For each import in the file, add the file to the import's usage list
+          if (Array.isArray(imports)) {
+            imports.forEach((pkg) => {
+              if (!packageUsage[pkg]) {
+                packageUsage[pkg] = { count: 0, files: [] };
+              }
+              packageUsage[pkg].count += 1;
+            });
+          }
+        });
+
+        setPackageUsage(packageUsage);
 
         // Sort packages by usage count
-        const sorted = Object.keys(analysisData.packageUsage || {}).sort(
-          (a, b) =>
-            analysisData.packageUsage[b].count -
-            analysisData.packageUsage[a].count
+        const sorted = Object.keys(packageUsage).sort(
+          (a, b) => packageUsage[b].count - packageUsage[a].count
         );
 
         setSortedPackages(sorted);
@@ -75,8 +85,7 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
   };
 
   const openFile = (filePath: string) => {
-    // Use the custom message handler to open files
-    PackagePilotMessageHandler.openFile(filePath);
+    messageHandler.send("OPEN_FILE", { filePath });
   };
 
   if (loading) {
@@ -149,6 +158,8 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <pre>{JSON.stringify(sortedPackages, null, 4)}</pre>
+
         {sortedPackages.map((pkg) => {
           const pkgData = packages[pkg] || {
             name: pkg,

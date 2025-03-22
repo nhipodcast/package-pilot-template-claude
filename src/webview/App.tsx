@@ -1,8 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import PackagePilotMessageHandler, {
-  CommandType,
-} from "./components/utils/messageHandler";
+import { messageHandler } from "@estruyf/vscode/dist/client";
 import PackageAnalysis from "./components/PackageAnalysis";
 
 export interface IAppProps {}
@@ -19,14 +17,13 @@ export const App: React.FunctionComponent<IAppProps> = () => {
   };
 
   const sendMessage = () => {
-    PackagePilotMessageHandler.send(CommandType.PostData, {
-      msg: "Hello from Package Pilot!",
-    });
+    messageHandler.send("POST_DATA", { msg: "Hello from Package Pilot!" });
   };
 
   const requestData = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.request<string>(CommandType.GetData)
+    messageHandler
+      .request<string>("GET_DATA")
       .then((msg) => {
         setMessageHandler(msg);
       })
@@ -40,7 +37,8 @@ export const App: React.FunctionComponent<IAppProps> = () => {
 
   const requestWithErrorData = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.request<string>(CommandType.GetDataError)
+    messageHandler
+      .request<string>("GET_DATA_ERROR")
       .then((msg) => {
         console.log(
           `%c msg ` + JSON.stringify(msg, null, 4),
@@ -58,41 +56,37 @@ export const App: React.FunctionComponent<IAppProps> = () => {
 
   const analyzeCurrentFile = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.analyzeCurrentFile();
+    messageHandler.send("ANALYZE_CURRENT_FILE");
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const analyzeFolder = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.analyzeFolder();
+    messageHandler.send("ANALYZE_FOLDER");
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const analyzeProject = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.analyzeProject();
+    messageHandler.send("ANALYZE_PROJECT");
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const selectFilesToAnalyze = () => {
     setIsLoading(true);
-    PackagePilotMessageHandler.analyzePickedFiles();
+    messageHandler.send("ANALYZE_PICKED_FILES");
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const goBackToHome = () => {
     setCurrentView("home");
-    setMessageHandler("");
+    setMessageHandler("xz");
     setError("");
   };
-
-  if (currentView === "analysis") {
-    return <PackageAnalysis onBack={goBackToHome} />;
-  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -104,6 +98,7 @@ export const App: React.FunctionComponent<IAppProps> = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <PackageAnalysis onBack={goBackToHome} />
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
             File Analysis
