@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { messageHandler } from "@estruyf/vscode/dist/client";
+import PackagePilotMessageHandler, {
+  CommandType,
+} from "./utils/messageHandler";
 
 interface PackageData {
   name: string;
@@ -43,12 +45,14 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
   const fetchAnalysisData = async () => {
     try {
       setLoading(true);
-      messageHandler.send("ANALYZE_PROJECT");
-      // Request analysis data from the extension
-      const analysisData = await messageHandler.request<{
+      // Trigger analysis using our custom message handler
+      PackagePilotMessageHandler.analyzeProject();
+
+      // Request analysis data using the custom message handler
+      const analysisData = await PackagePilotMessageHandler.getAnalysisData<{
         packageData: Record<string, PackageData>;
         packageUsage: Record<string, PackageUsage>;
-      }>("GET_ANALYSIS_DATA");
+      }>();
 
       if (analysisData) {
         setPackages(analysisData.packageData || {});
@@ -71,7 +75,8 @@ export const PackageAnalysis: React.FC<PackageAnalysisProps> = ({ onBack }) => {
   };
 
   const openFile = (filePath: string) => {
-    messageHandler.send("OPEN_FILE", { filePath });
+    // Use the custom message handler to open files
+    PackagePilotMessageHandler.openFile(filePath);
   };
 
   if (loading) {

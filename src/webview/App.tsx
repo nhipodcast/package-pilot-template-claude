@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { messageHandler } from "@estruyf/vscode/dist/client";
+import PackagePilotMessageHandler, {
+  CommandType,
+} from "./components/utils/messageHandler";
 import PackageAnalysis from "./components/PackageAnalysis";
 
 export interface IAppProps {}
@@ -17,13 +19,14 @@ export const App: React.FunctionComponent<IAppProps> = () => {
   };
 
   const sendMessage = () => {
-    messageHandler.send("POST_DATA", { msg: "Hello from Package Pilot!" });
+    PackagePilotMessageHandler.send(CommandType.PostData, {
+      msg: "Hello from Package Pilot!",
+    });
   };
 
   const requestData = () => {
     setIsLoading(true);
-    messageHandler
-      .request<string>("GET_DATA")
+    PackagePilotMessageHandler.request<string>(CommandType.GetData)
       .then((msg) => {
         setMessageHandler(msg);
       })
@@ -37,8 +40,7 @@ export const App: React.FunctionComponent<IAppProps> = () => {
 
   const requestWithErrorData = () => {
     setIsLoading(true);
-    messageHandler
-      .request<string>("GET_DATA_ERROR")
+    PackagePilotMessageHandler.request<string>(CommandType.GetDataError)
       .then((msg) => {
         console.log(
           `%c msg ` + JSON.stringify(msg, null, 4),
@@ -56,35 +58,35 @@ export const App: React.FunctionComponent<IAppProps> = () => {
 
   const analyzeCurrentFile = () => {
     setIsLoading(true);
-    messageHandler.send("ANALYZE_CURRENT_FILE");
+    PackagePilotMessageHandler.analyzeCurrentFile();
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const analyzeFolder = () => {
     setIsLoading(true);
-    messageHandler.send("ANALYZE_FOLDER");
+    PackagePilotMessageHandler.analyzeFolder();
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const analyzeProject = () => {
     setIsLoading(true);
-    messageHandler.send("ANALYZE_PROJECT");
+    PackagePilotMessageHandler.analyzeProject();
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const selectFilesToAnalyze = () => {
     setIsLoading(true);
-    messageHandler.send("ANALYZE_PICKED_FILES");
+    PackagePilotMessageHandler.analyzePickedFiles();
     setCurrentView("analysis");
     setIsLoading(false);
   };
 
   const goBackToHome = () => {
     setCurrentView("home");
-    setMessageHandler("xz");
+    setMessageHandler("");
     setError("");
   };
 
