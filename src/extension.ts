@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
-    "vscode-react-webview-starter.openWebview",
+    "package-pilot-vs.openWebview",
     () => {
       const panel = vscode.window.createWebviewPanel(
         "react-webview",

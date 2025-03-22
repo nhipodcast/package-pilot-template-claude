@@ -1,6 +1,6 @@
 {
-  "name": "vscode-react-webview-starter",
-  "displayName": "vscode-react-webview-starter",
+  "name": "package-pilot-vs",
+  "displayName": "package-pilot-vs",
   "description": "",
   "version": "0.0.1",
   "repository": {
@@ -18,7 +18,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-react-webview-starter.openWebview",
+        "command": "package-pilot-vs.openWebview",
         "title": "React Webview: Open webview"
       }
     ]
